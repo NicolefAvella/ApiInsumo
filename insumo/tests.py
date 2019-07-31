@@ -35,7 +35,7 @@ class GetInsumosTest(BaseViewTest):
         )
         
 
-        expected = insumos.objects.all()
-        serialized = insumosSerializer(expected, many=True)
+        expected = Insumo.objects.all()
+        serialized = InsumoSerializer(expected, many=True)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
