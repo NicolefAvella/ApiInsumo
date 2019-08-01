@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Insumo(models.Model):
+class Insumos(models.Model):
     name = models.CharField(max_length=255, null=False)
 
     machine = models.CharField(max_length=255, null=False)

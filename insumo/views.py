@@ -1,12 +1,14 @@
 from rest_framework import generics
-from .models import Insumo
-from .serializers import InsumoSerializer
+from .models import Insumos
+from .serializers import InsumosSerializer, TokenSerializer, UserSerializer
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from rest_framework_jwt.settings import api_settings
 from rest_framework import permissions
-
+from rest_framework.response import Response
+from rest_framework.views import status
+#from .decorators import validate_request_data
 # Get the JWT settings, add these lines after the import/from lines
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -15,13 +17,13 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 class ListInsumosView(generics.ListAPIView):
 
-    queryset = Insumo.objects.all()
-    serializer_class = InsumoSerializer
+    queryset = Insumos.objects.all()
+    serializer_class = InsumosSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
 
 class LoginView(generics.CreateAPIView):
-    """ POST auth/login/ """
+	#Logeo
     permission_classes = (permissions.AllowAny,)
     queryset = User.objects.all()
 
@@ -31,7 +33,6 @@ class LoginView(generics.CreateAPIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # login saves the user’s ID in the session,
-            # using Django’s session framework.
             login(request, user)
             serializer = TokenSerializer(data={
                 # using drf jwt utility functions to generate a token
@@ -43,9 +44,7 @@ class LoginView(generics.CreateAPIView):
         return Response(status=status.HTTP_401_UNAUTHORIZED)    
 
 class RegisterUsersView(generics.CreateAPIView):
-    """
-    POST auth/register/
-    """
+	#Registro
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
@@ -55,7 +54,7 @@ class RegisterUsersView(generics.CreateAPIView):
         if not username and not password and not email:
             return Response(
                 data={
-                    "message": "username, password and email is required to register a user"
+                    "message": "Todos los datos de usuario son requeridos para el registro"
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

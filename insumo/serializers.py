@@ -1,14 +1,20 @@
 from rest_framework import serializers
-from .models import Insumo
+from django.contrib.auth.models import User
+from .models import Insumos
 
 
-class InsumoSerializer(serializers.ModelSerializer):
+class InsumosSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Insumo
+        model = Insumos
         fields = ("name", "machine")
 
 class TokenSerializer(serializers.Serializer):
-    """
-    This serializer serializes the token data
-    """
-    token = serializers.CharField(max_length=255)        
+    token = serializers.CharField(max_length=255)   
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("username", "email")     
+

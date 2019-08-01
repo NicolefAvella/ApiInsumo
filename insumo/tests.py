@@ -1,12 +1,12 @@
 import json
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
 
-from .models import Insumo
-from .serializers import InsumoSerializer
+from .models import Insumos
+from .serializers import InsumosSerializer
 
-from django.contrib.auth.models import User
 
 class BaseViewTest(APITestCase):
     client = APIClient()
@@ -14,10 +14,21 @@ class BaseViewTest(APITestCase):
     @staticmethod
     def create_insumo(name="", machine=""):
         if name != "" and machine != "":
-            Insumo.objects.create(name=name, machine=machine)
+            Insumos.objects.create(name=name, machine=machine)
+
+    def login_a_user(self, username="", password=""):
+        url = reverse("auth-login")
+
+        return self.client.post(
+            url,
+            data=json.dumps({
+                "username": username,
+                "password": password,
+            }),
+            content_type="application/json"
+        )
 
     def login_client(self, username="", password=""):
-        # get a token from DRF
         response = self.client.post(
             reverse('create-token'),
             data=json.dumps(
@@ -29,27 +40,11 @@ class BaseViewTest(APITestCase):
             content_type='application/json'
         )
         self.token = response.data['token']
-        # set the token in the header
         self.client.credentials(
             HTTP_AUTHORIZATION='Bearer ' + self.token
         )
         self.client.login(username=username, password=password)
         return self.token    
-
-
-
-    def login_a_user(self, username="", password=""):
-        url = reverse(
-            "auth-login",
-        )
-        return self.client.post(
-            url,
-            data=json.dumps({
-                "username": username,
-                "password": password
-            }),
-            content_type="application/json"
-        ) 
 
 
     def register_a_user(self, username="", password="", email=""):
@@ -78,30 +73,26 @@ class BaseViewTest(APITestCase):
             last_name="user",
         )
 
-        # Datos prueba para test obtener todos los insumos
+        # Datos prueba para test obtener todos los Insumoss
         self.create_insumo("retendeor", "rectilinea")
         self.create_insumo("rueda", "rectilinea")
-        self.create_insumo("depillo", "lavadora")
+        self.create_insumo("cepillo", "lavadora")
         self.create_insumo("potenciometro", "mesa corte")
 
 
 class GetInsumosTest(BaseViewTest):
-	
 
     def test_get_all_insumos(self):
-        """
-        This test ensures that all insumos added in the setUp method
-        exist when we make a GET request to the insumos/ endpoint
-        """
-        self.login_client('test_user', 'testing')
+
+        self.login_client('test_user', 'test123')
 
         response = self.client.get(
             reverse("insumos-all")
         )
         
 
-        expected = Insumo.objects.all()
-        serialized = InsumoSerializer(expected, many=True)
+        expected = Insumos.objects.all()
+        serialized = InsumosSerializer(expected, many=True)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -111,12 +102,21 @@ class AuthLoginUserTest(BaseViewTest):
 
     def test_login_user_with_valid_credentials(self):
         # test login with valid credentials
-        response = self.login_a_user("test_user", "testing")
-        # assert token key exists
+        response = self.login_a_user("test_user", "test123")
         self.assertIn("token", response.data)
-        # assert status code is 200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # test login with invalid credentials
         response = self.login_a_user("anonymous", "pass")
-        # assert status code is 401 UNAUTHORIZED
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class AuthRegisterUserTest(BaseViewTest):
+
+    def test_register_a_user(self):
+        response = self.register_a_user("nuevo_usuario", "test123", "test@gmail.com")
+
+        self.assertEqual(response.data["username"], "nuevo_usuario")
+        self.assertEqual(response.data["email"], "test@gmail.com")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Test con datos invalidos
+        response = self.register_a_user()
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
