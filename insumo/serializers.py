@@ -9,6 +9,12 @@ class InsumosSerializer(serializers.ModelSerializer):
         model = Insumos
         fields = ("name", "machine")
 
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
+        instance.machine = validated_data.get("machine", instance.machine)
+        instance.save()
+        return instance
+
 class TokenSerializer(serializers.Serializer):
     token = serializers.CharField(max_length=255)   
 
