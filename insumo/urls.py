@@ -1,19 +1,12 @@
 from django.urls import path
-from .views import ListInsumosView, LoginView, RegisterUsersView
+from .views import ListInsumosView, LoginView, RegisterUsersView, InsumosDetailView
 
 
 urlpatterns = [
     path('insumos/', ListInsumosView.as_view(), name="insumos-all"),
+    path('insumos/<int:pk>/', InsumosDetailView.as_view(), name="insumos-detail"),
     path('auth/login/', LoginView.as_view(), name="auth-login"),
     path('auth/register/', RegisterUsersView.as_view(), name="auth-register"),
-]
-
-
-urlpatterns = [
-    path('songs/', ListCreateSongsView.as_view(), name="songs-list-create"),
-    path('songs/<int:pk>/', SongsDetailView.as_view(), name="songs-detail"),
-    path('auth/login/', LoginView.as_view(), name="auth-login"),
-    path('auth/register/', RegisterUsers.as_view(), name="auth-register")
 ]
 
 
