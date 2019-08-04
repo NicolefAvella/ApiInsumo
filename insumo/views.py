@@ -21,7 +21,8 @@ class ListInsumosView(generics.ListAPIView):
     serializer_class = InsumosSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    @validate_request_data
+
+    #@validate_request_data
     def post(self, request, *args, **kwargs):
         un_insumo = Insumos.objects.create(
             name=request.data["name"],
@@ -82,6 +83,7 @@ class LoginView(generics.CreateAPIView):
 	#Logeo
     permission_classes = (permissions.AllowAny,)
     queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
         username = request.data.get("username", "")
@@ -89,7 +91,7 @@ class LoginView(generics.CreateAPIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # login saves the user’s ID in the session,
-            login(request, user)
+            #login(request, user)
             serializer = TokenSerializer(data={
                 # using drf jwt utility functions to generate a token
                 "token": jwt_encode_handler(
@@ -97,12 +99,13 @@ class LoginView(generics.CreateAPIView):
                 )})
             serializer.is_valid()
             return Response(serializer.data)
-        return Response(status=status.HTTP_401_UNAUTHORIZED) 
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class RegisterUsersView(generics.CreateAPIView):
 	#Registro
     permission_classes = (permissions.AllowAny,)
+    serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
         username = request.data.get("username", "")

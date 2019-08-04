@@ -48,7 +48,7 @@ class BaseViewTest(APITestCase):
                 }
             )
         )
-       
+
     def delete_insumo(self, pk=0):
         return self.client.delete(
             reverse(
@@ -58,7 +58,7 @@ class BaseViewTest(APITestCase):
                 }
             )
         )
-       
+
 
 
     def login_a_user(self, username="", password=""):
@@ -86,10 +86,10 @@ class BaseViewTest(APITestCase):
         )
         self.token = response.data['token']
         self.client.credentials(
-            HTTP_AUTHORIZATION='Soporte ' + self.token
+            HTTP_AUTHORIZATION='Bearer ' + self.token
         )
         self.client.login(username=username, password=password)
-        return self.token    
+        return self.token
 
 
     def register_a_user(self, username="", password="", email=""):
@@ -105,7 +105,7 @@ class BaseViewTest(APITestCase):
                 }
             ),
             content_type='application/json'
-        )       
+        )
 
     def setUp(self):
 
@@ -123,7 +123,7 @@ class BaseViewTest(APITestCase):
         self.create_insumo("rueda", "rectilinea")
         self.create_insumo("cepillo", "lavadora")
         self.create_insumo("potenciometro", "mesa corte")
-        
+
         self.valid_data = {
             "name": "test name",
             "machine" : "test machine"
@@ -147,7 +147,7 @@ class GetInsumosTest(BaseViewTest):
         response = self.client.get(
             reverse("insumos-all")
         )
-        
+
 
         expected = Insumos.objects.all()
         serialized = InsumosSerializer(expected, many=True)
@@ -186,7 +186,7 @@ class AddInsumosTest(BaseViewTest):
         )
         self.assertEqual(response.data, self.valid_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         # test con datos no validos
         response = self.make_a_request(
             kind="post",

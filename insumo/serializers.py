@@ -16,11 +16,10 @@ class InsumosSerializer(serializers.ModelSerializer):
         return instance
 
 class TokenSerializer(serializers.Serializer):
-    token = serializers.CharField(max_length=255)   
+    token = serializers.CharField(max_length=255)
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("username", "email")     
-
+        fields = ("username", "password")
